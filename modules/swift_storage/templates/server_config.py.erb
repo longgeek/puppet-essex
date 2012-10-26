@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+import os
+
+disk_part = <%= storage_disk_part %>
+bind_ip = os.popen("ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}'").read().strip()
+
+for i in disk_part:
+	account_server = """
+cat > /etc/swift/account-server/"""+i+""".conf << _GEEK_
+[DEFAULT]
+bind_ip = """+bind_ip+"""
+bind_port = 6002
+mount_check = false
+user = swift
+devices = <%= storage_base_dir %>"""+i+"""
+swift_dir = /etc/swift
+workers = <%= storage_workers %> 
+log_level = DEBUG
+log_facility = LOG_LOCAL1
+
+[pipeline:main]
+pipeline = account-server
+
+[app:account-server]
+use = egg:swift#account
+
+[account-replicator]
+
+[account-auditor]
+
+[account-reaper]
+_GEEK_
+"""
+
+	container_server = """
+cat > /etc/swift/container-server/"""+i+""".conf << _GEEK_
+[DEFAULT]
+bind_ip = """+bind_ip+"""
+bind_port = 6001
+mount_check = false
+user = swift
+devices = <%= storage_base_dir %>"""+i+"""
+workers = <%= storage_workers %> 
+swift_dir = /etc/swift
+log_level = DEBUG
+log_facility = LOG_LOCAL2
+
+[pipeline:main]
+pipeline = container-server
+
+[app:container-server]
+use = egg:swift#container
+
+[container-replicator]
+
+[container-updater]
+
+[container-auditor]
+
+[container-sync]
+_GEEK_
+"""
+
+	object_server = """
+cat > /etc/swift/object-server/"""+i+""".conf << _GEEK_
+[DEFAULT]
+bind_ip = """+bind_ip+"""
+bind_port = 6000
+user = swift 
+devices = <%= storage_base_dir %>"""+i+"""
+mount_check = false
+swift_dir = /etc/swift
+workers = <%= storage_workers %> 
+log_level = DEBUG
+log_facility = LOG_LOCAL3
+
+[pipeline:main]
+pipeline = object-server
+
+[app:object-server]
+use = egg:swift#object
+
+[object-replicator]
+
+[object-updater]
+
+[object-auditor]
+_GEEK_
+"""
+	os.system(container_server)
+	os.system(account_server)
+	os.system(object_server)
+
+
+

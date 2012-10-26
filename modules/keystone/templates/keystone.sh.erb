@@ -1,0 +1,219 @@
+##var
+
+#1.首先，创建一个默认的租户
+ID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 tenant-create --name <%= admin_tenant %> --description "Default Tenant" --enabled true | grep id | awk '{print $4}'`
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+#2.创建一个默认的用户名为admin
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-create --tenant_id $ID --name <%= admin_user %> --pass <%= admin_password %> --enabled true > 1.txt 
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+ADMINUSERID=`cat 1.txt | grep id |cut -d'|' -f 3|grep -v admid`
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+#3.
+ADMINID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 role-create --name admin | grep id | awk '{print $4}'`
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+#4.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 role-create --name memberRole
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 role-create --name Member
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+
+#5.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-role-add --user $ADMINUSERID --tenant_id $ID --role $ADMINID
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+
+#6. service
+#SERVICEID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 tenant-create --name service --description "Service Tenant" --enabled true | grep id | awk '{print $4}'`
+#
+#if [ $? -eq 0 ];then
+#	echo right
+#else
+#	echo err
+#fi
+#7.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-create --tenant_id $ID --name glance --pass glance --enabled true > 2.txt
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+GLANCEID=`cat 2.txt | grep id | awk '{print $4}' | head -1 `
+
+#8.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-role-add --user $GLANCEID --tenant_id $ID --role $ADMINID
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#9.
+EC2ID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-create --tenant_id $ID --name ec2 --pass ec2 --enabled true | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#10.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-role-add --user $EC2ID --tenant_id $ID --role $ADMINID
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#11.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-create --tenant_id $ID --name swift --pass swift --enabled true > 4.txt
+SWIFTID=`cat 4.txt | grep id | awk '{print $4}' | head -1 `
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#12.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 user-role-add --user $SWIFTID --tenant_id $ID --role $ADMINID
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+
+
+
+
+#2222222222
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 service-create --name keystone --type identity --description "Keystone Identity Service"  > 3.txt
+KEYSTONEID=`cat 3.txt | grep id| awk '{print $4}' | head -1`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#2. -> public5000 其他两个35357
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 endpoint-create  --region RegionOne  --service_id $KEYSTONEID --publicurl http://<%= keystone_lan_ip %>:5000/v2.0 --internalurl http://<%= keystone_lan_ip %>:35357/v2.0 --adminurl http://<%= keystone_lan_ip %>:35357/v2.0
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 endpoint-create  --region RegionOne  --service_id $KEYSTONEID --publicurl http://<%= keystone_wlan_ip %>:5000/v2.0 --internalurl http://<%= keystone_wlan_ip %>:35357/v2.0 --adminurl http://<%= keystone_wlan_ip %>:35357/v2.0
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#3.
+NOVAID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 service-create --name=nova --type=compute --description="Nova Compute Service" | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#4.  修改v2  -> v2.0
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 endpoint-create --region RegionOne --service_id=$NOVAID --publicurl=http://<%= ec2_host %>:8774/v2/\$\(tenant_id\)s --internalurl=http://<%= ec2_host %>:8774/v2/\$\(tenant_id\)s --adminurl=http://<%= ec2_host %>:8774/v2/\$\(tenant_id\)s
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#5.
+VOLUMEID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 service-create --name=volume --type=volume --description="Nova Volume Service" | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#6.
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  endpoint-create --region RegionOne --service_id=$VOLUMEID  --publicurl=http://<%= ec2_host %>:8776/v1/\$\(tenant_id\)s --internalurl=http://<%= ec2_host %>:8776/v1/\$\(tenant_id\)s --adminurl=http://<%= ec2_host %>:8776/v1/\$\(tenant_id\)s
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#7.
+GLANCEID=`keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 service-create  --name=glance  --type=image  --description="Glance Image Service" | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#8.去掉v1
+keystone --token <%= keystone_admin_token %> --endpoint http://<%= keystone_lan_ip %>:35357/v2.0 endpoint-create  --region RegionOne --service_id=$GLANCEID --publicurl=http://<%= glance_host %>:9292/v1 --internalurl=http://<%= glance_host %>:9292/v1 --adminurl=http://<%= glance_host %>:9292/v1
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#9.
+CID=`keystone  --token <%= keystone_admin_token %>  --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  service-create --name=ec2  --type=ec2 --description="EC2 Compatibility Layer" | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#10.
+keystone --token <%= keystone_admin_token %>  --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  endpoint-create  --region RegionOne --service_id=$CID --publicurl=http://<%= ec2_host %>:8773/services/Cloud --internalurl=http://<%= ec2_host %>:8773/services/Cloud  --adminurl=http://<%= ec2_host %>:8773/services/Admin
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+#11.
+DID=`keystone  --token <%= keystone_admin_token %>  --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  service-create  --name=swift  --type=object-store  --description="Object Storage Service" | grep id | awk '{print $4}'`
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+#12.
+keystone --token <%= keystone_admin_token %>  --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  endpoint-create  --region RegionOne  --service_id=$DID --publicurl=http://<%= swift_proxy_lan_ip %> :8080/v1/AUTH_\$\(tenant_id\)s --adminurl=http://<%= swift_proxy_lan_ip %>:8080/ --internalurl=http://<%= swift_proxy_lan_ip %>:8080/v1/AUTH_\$\(tenant_id\)s 
+keystone --token <%= keystone_admin_token %>  --endpoint http://<%= keystone_lan_ip %>:35357/v2.0  endpoint-create  --region RegionOne  --service_id=$DID --publicurl=http://<%= swift_proxy_wlan_ip %>:8080/v1/AUTH_\$\(tenant_id\)s --adminurl=http://<%= swift_proxy_wlan_ip %>:8080/ --internalurl=http://<%= swift_proxy_wlan_ip %>:8080/v1/AUTH_\$\(tenant_id\)s 
+
+
+if [ $? -eq 0 ];then
+	echo right
+else
+	echo err
+fi
+
+rm -f {1,2,3,4}.txt

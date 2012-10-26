@@ -1,0 +1,57 @@
+[DEFAULT]
+bind_port = 8080
+bind_ip = 0.0.0.0
+user = swift
+swift_dir = /etc/swift
+workers = <%= proxy_workers %> 
+log_name = swift
+log_level = DEBUG
+log_facility = LOG_LOCAL1
+
+[pipeline:main]
+pipeline = healthcheck cache swift3 s3token authtoken keystone proxy-server
+
+[app:proxy-server]
+use = egg:swift#proxy
+allow_account_management = true
+account_autocreate = true
+
+[filter:keystone]
+paste.filter_factory = keystone.middleware.swift_auth:filter_factory
+operator_roles = Member,admin,SwiftOperator
+is_admin = true
+#reseller_prefix=AUTH
+
+# NOTE(chmou): s3token middleware is not updated yet to use only
+# username and password.
+[filter:s3token]
+paste.filter_factory = keystone.middleware.s3_token:filter_factory
+service_port = <%= keystone_lan_ip %>
+service_host = 5000
+auth_host = <%= keystone_lan_ip %>
+auth_port = 35357
+auth_protocol = http
+auth_token = token
+admin_token = token
+
+[filter:authtoken]
+paste.filter_factory = keystone.middleware.auth_token:filter_factory
+auth_host = <%= keystone_lan_ip %>
+auth_port = 35357
+auth_protocol = http
+auth_uri = http://<%= keystone_lan_ip %>:5000/
+admin_tenant_name = <%= admin_tenant %>
+admin_user = <%= admin_user %>
+admin_password = <%= admin_password %>
+auth_token = <%= keystone_admin_token %>
+admin_token = <%= keystone_admin_token %>
+
+[filter:swift3]
+use = egg:swift#swift3
+
+[filter:healthcheck]
+use = egg:swift#healthcheck
+
+[filter:cache]
+use = egg:swift#memcache
+memcache_servers = <%= memcached_host %>:11211

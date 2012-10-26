@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+
+IPADDR=`ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}'`
+cat > /etc/rsyncd.conf << _DCloud_
+uid = swift
+gid = swift
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+address = $IPADDR
+
+[account]
+max_connections = 2 
+path = <%= storage_base_dir %>
+read only = false
+lock file = /var/lock/account.lock
+
+[container]
+max_connections = 2 
+path = <%= storage_base_dir %>
+read only = false
+lock file = /var/lock/container.lock
+
+[object]
+max_connections = 2 
+path = <%= storage_base_dir %>
+read only = false
+lock file = /var/lock/object.lock
+_DCloud_
+sed -i 's/yes/no/g' /etc/xinetd.d/rsync
+wget ftp://<%= swift_proxy_lan_ip %>/pub/*.gz
+mv *.gz /etc/swift/

@@ -1,0 +1,80 @@
+[DEFAULT]
+### STATE
+debug = False
+verbose = <%= verbose %>
+
+### Authentication
+auth_strategy=keystone
+
+### Scheduler
+compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+
+### Databases
+sql_connection = mysql://nova:<%= nova_db_password %>@<%= mysql_host %>/nova
+
+### APIS
+use_s3 = True
+s3_host = <%= nova_control_host %>
+s3_port = 8080
+ec2_host = <%= nova_control_host %>
+ec2_url = http://<%= nova_control_host %>:8773/services/Cloud            
+cc_host = <%= nova_control_host %>
+
+### Rabbitmq
+rabbit_host = <%= rabbit_host %>
+rabbit_user = <%= rabbit_user %>
+rabbit_password = <%= rabbit_password %>
+
+### Glance
+glance_api_servers = <%= glance_host %>:9292
+image_service = nova.image.glance.GlanceImageService
+snapshot_image_format = qcow2
+use_cow_image = True
+
+### Volume
+volume_group=nova-volumes
+volume_name_template=volume-%08x
+iscsi_helper = tgtadm
+iscsi_ip_address = <%= nova_control_host %>
+
+### Network
+network_manager = nova.network.manager.FlatDHCPManager
+public_interface = <%= public_interface %>
+flat_interface = <%= flat_interface %>
+flat_network_bridge = br100
+fixed_range = <%= fixed_range %>
+floating_range = <%= floating_range %>
+network_size = <%= network_size %>
+flat_injected = False
+multi_host = <%= multi_host %>
+injected_network_template = /usr/share/nova/interfaces.template
+ 
+### noVNC
+novncproxy_base_url = http://<%= nova_control_host %>:6080/vnc_auto.html
+vncserver_proxyclient_address = <%= nova_compute_host %>
+vncserver_listen = 0.0.0.0
+
+### Nova
+logdir = /var/log/nova
+state_path = /var/lib/nova
+lock_path = /var/lib/nova/tmp
+dhcpbridge = /usr/bin/nova-dhcpbridge
+dhcpbridge_flagfile = /etc/nova/nova.conf
+force_dhcp_release = True
+libvirt_xml_template = /usr/share/nova/libvirt.xml.template
+libvirt_nonblocking = True
+vpn_client_template = /usr/share/nova/client.ovpn.template
+credentials_template = /usr/share/nova/novarc.template
+firewall_driver = nova.virt.libvirt.firewall.IptablesFirewallDriver
+rpc_backend = nova.rpc.impl_kombu
+root_helper = sudo nova-rootwrap
+allow_admin_api = True
+use_deprecated_auth = False
+routing_source_ip = <%= nova_control_host %>
+api_paste_config = /etc/nova/api-paste.ini
+connection_type = libvirt
+libvirt_type = <%= libvirt_type %>
+libvirt_use_virtio_for_bridges = True
+libvirt_inject_partition = -1
+start_guests_on_host_boot = True
+resume_guests_state_on_host_boot = True

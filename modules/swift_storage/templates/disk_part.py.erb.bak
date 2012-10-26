@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+
+import os, re
+
+disk_part = <%= storage_disk_part %>
+for part in range(len(disk_part)):
+	part = (re.findall("[a-z]{3}",disk_part[part]))[0]
+	os.system("parted /dev/"+part+" -s -- mklabel msdos")
+	os.system("parted /dev/"+part+" -s -- mkpart primary 0 100%; partx -a /dev/"+part+"")
+
+for part in disk_part:
+	os.system("mkfs.xfs -i size=1024 /dev/"+part+" -f")
+	os.system("echo \"/dev/"+part+" /swift-storage/"+part+" xfs noatime,nodiratime,nobarrier,logbufs=8 0 0\" >> /etc/fstab")
+	os.system("mkdir -p /swift-storage/"+part+"; mount /swift-storage/"+part+"")
