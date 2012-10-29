@@ -13,7 +13,7 @@ bind_ip = """+bind_ip+"""
 bind_port = 6002
 mount_check = false
 user = swift
-devices = <%= storage_base_dir %>"""+i+"""
+devices = <%= storage_base_dir %>
 swift_dir = /etc/swift
 workers = <%= storage_workers %> 
 log_level = DEBUG
@@ -40,7 +40,7 @@ bind_ip = """+bind_ip+"""
 bind_port = 6001
 mount_check = false
 user = swift
-devices = <%= storage_base_dir %>"""+i+"""
+devices = <%= storage_base_dir %>
 workers = <%= storage_workers %> 
 swift_dir = /etc/swift
 log_level = DEBUG
@@ -68,7 +68,7 @@ cat > /etc/swift/object-server/"""+i+""".conf << _GEEK_
 bind_ip = """+bind_ip+"""
 bind_port = 6000
 user = swift 
-devices = <%= storage_base_dir %>"""+i+"""
+devices = <%= storage_base_dir %>
 mount_check = false
 swift_dir = /etc/swift
 workers = <%= storage_workers %> 

@@ -40,5 +40,6 @@ class glance::config {
 		group => "root",
 		mode => 0644,
 		require => File["/etc/glance/glance-registry-paste.ini"],
+        notify => Service["openstack-glance-registry"],
 	}
 }

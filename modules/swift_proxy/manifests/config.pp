@@ -4,7 +4,7 @@ class swift_proxy::config {
 		owner => 'root',
 		group => 'root',
 		mode => 644,
-		require => Package["openstack-swift", "openstack-swift-proxy", "vsftpd"],
+		require => Package["openstack-swift", "openstack-swift-proxy"],
 	
 	}
 

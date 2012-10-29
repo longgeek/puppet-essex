@@ -11,8 +11,8 @@ class nova_control::command {
     exec { "nova_iptables":
         command => "mkdir -p /tmp/test/nova_control;
 					nova-manage db sync;
-                    nova secgroup-add-rule default tcp 22 22 0.0.0.0/0;
-                    nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0;
+                    nova --os_username=$admin_user --os_password=$admin_password --os_tenant_name=$admin_tenant --os_auth_url=http://$keystone_lan_ip:5000/v2.0 secgroup-add-rule default tcp 22 22 0.0.0.0/0;
+                    nova --os_username=$admin_user --os_password=$admin_password --os_tenant_name=$admin_tenant --os_auth_url=http://$keystone_lan_ip:5000/v2.0 secgroup-add-rule default icmp -1 -1 0.0.0.0/0;
                     iptables -I INPUT 1 -p tcp -m multiport --dport 8773:8776,6080 -j ACCEPT;
                     /etc/init.d/iptables save;
 					",

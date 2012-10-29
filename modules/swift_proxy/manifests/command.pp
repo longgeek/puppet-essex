@@ -1,8 +1,7 @@
 class swift_proxy::command {
 	exec { "ring":
 		command => 'python /etc/swift/ring.py;
-					mv /etc/swift/*.gz /var/ftp/pub/;
-					cp /var/ftp/pub/*.gz /etc/swift/
+					mv ./*.ring.gz /etc/swift/;
 					',
 		path => $command_path,
 		refreshonly => true,
@@ -17,13 +16,13 @@ class swift_proxy::command {
 					iptables -I INPUT 1 -p tcp --dport 8080 -j ACCEPT;
 					iptables -I INPUT 1 -p tcp --dport 21 -j ACCEPT;
 					/etc/init.d/iptables save;
-					echo -e "pasv_min_port=20000\npasv_max_port=21000" >> /etc/vsftpd/vsftpd.conf;
-					iptables -I INPUT 1 -p tcp --dport 20000:21000 -j ACCEPT;
-					/etc/init.d/vsftpd start;
-					chkconfig vsftpd on;
 					',
 		path => $command_path,
 		creates => "/tmp/test/swift_proxy",
 		require => Exec["ring"],
+					#echo -e "pasv_min_port=20000\npasv_max_port=21000" >> /etc/vsftpd/vsftpd.conf;
+					#iptables -I INPUT 1 -p tcp --dport 20000:21000 -j ACCEPT;
+					#/etc/init.d/vsftpd start;
+					#chkconfig vsftpd on;
 	}
 }

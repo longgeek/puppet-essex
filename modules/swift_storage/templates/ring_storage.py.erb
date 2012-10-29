@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os,re
+SwiftStorage_Num = <%= storage_numbers %>
+
+SwiftStorage_List = []
+SwiftStorage_IP = <%= storage_node_ip %>
+SwiftStorage_IP.insert(0,'none')
+
+##输入swift-storage节点的ip地址
+for i in range(1,int(SwiftStorage_Num)+1):
+	SwiftStorage_List.append(SwiftStorage_IP[i])
+LongList = len(SwiftStorage_List)
+SwiftStorage_List.insert(0,'none')
+## 5.创建ring文件
+CreateRing = """
+cd /etc/swift
+swift-ring-builder account.builder create <%= ring_part_power %> <%= ring_replicas %> <%= ring_min_part_hours %>
+swift-ring-builder container.builder create <%= ring_part_power %> <%= ring_replicas %> <%= ring_min_part_hours %>
+swift-ring-builder object.builder create <%= ring_part_power %> <%= ring_replicas %> <%= ring_min_part_hours %>
+"""
+os.system(CreateRing)
+
+storage_disk_part = <%= storage_disk_part %>
+for part in range(len(storage_disk_part)):
+	##向ring里添加存储
+	for j in range(1,int(LongList)+1):
+		RingAdd_Storage = """
+	cd /etc/swift
+	swift-ring-builder account.builder add z"""+str(j)+"""-"""+SwiftStorage_List[j]+""":6002/"""+storage_disk_part[part]+""" 100 
+	swift-ring-builder container.builder add z"""+str(j)+"""-"""+SwiftStorage_List[j]+""":6001/"""+storage_disk_part[part]+""" 100 
+	swift-ring-builder object.builder add z"""+str(j)+"""-"""+SwiftStorage_List[j]+""":6000/"""+storage_disk_part[part]+""" 100 
+		"""
+		os.system(RingAdd_Storage)
+##平衡环
+RingDone = """
+cd /etc/swift
+swift-ring-builder account.builder rebalance
+swift-ring-builder container.builder rebalance
+swift-ring-builder object.builder rebalance
+"""
+os.system(RingDone)
+

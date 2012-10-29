@@ -1,8 +1,9 @@
 class swift_storage::command {
 	exec { "storage_part":
-		command => 'python /etc/swift/disk_part.py;
-					python /etc/swift/server_config.py;
-					',
+		command => "python /etc/swift/server_config.py;
+					python /etc/swift/ring_storage.py;
+					",
+					#mv ./*.ring.gz /etc/swift/;
 		path => $command_path,
 		refreshonly => true,
 		notify => Service["xinetd", "rsyslog", "openstack-swift-account", "openstack-swift-container", "openstack-swift-object"],
@@ -10,6 +11,7 @@ class swift_storage::command {
 
 	exec { "storage_iptables_log":
 		command => "mkdir -p /tmp/test/swift_storage;
+					python /etc/swift/disk_part.py;
 					sh /etc/swift/rsyncd.sh;
 					sh /etc/swift/swift.conf.sh;
 					chown -R swift:swift $storage_base_dir;

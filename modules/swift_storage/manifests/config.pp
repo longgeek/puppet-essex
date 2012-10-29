@@ -30,6 +30,14 @@ class swift_storage::config {
 		group => 'root',
 		mode => 655,
 		require => File["/etc/swift/rsyncd.sh"],
+	}
+	
+	file { "/etc/swift/ring_storage.py":
+		content => template("swift_storage/ring_storage.py.erb"),
+		owner => 'root',
+		group => 'root',
+		mode => 655,
+		require => File["/etc/swift/server_config.py"],
 		notify => Exec["storage_part"],
 	}
 }

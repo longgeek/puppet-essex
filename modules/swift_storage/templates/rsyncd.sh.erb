@@ -28,5 +28,5 @@ read only = false
 lock file = /var/lock/object.lock
 _DCloud_
 sed -i 's/yes/no/g' /etc/xinetd.d/rsync
-wget ftp://<%= swift_proxy_lan_ip %>/pub/*.gz
-mv *.gz /etc/swift/
+#wget ftp://<%= swift_proxy_lan_ip %>/pub/*.gz
+#mv *.gz /etc/swift/
