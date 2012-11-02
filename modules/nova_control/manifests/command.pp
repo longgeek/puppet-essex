@@ -2,7 +2,7 @@ class nova_control::command {
     exec { "nova_db_sync":
         command => "nova-manage db sync;
                     nova-manage network create private --fixed_range_v4=$fixed_range --num_networks=1 --bridge=br100 --bridge_interface=$flat_interface --network_size=$network_size --multi_host=T;
-                    nova-manage floating create --ip_range=$floating_range;
+                    nova-manage floating create --ip_range=$floating_range --interface=$public_interface;
                    ",
         path => $command_path,
         refreshonly => true,
