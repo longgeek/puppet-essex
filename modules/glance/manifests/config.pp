@@ -35,11 +35,11 @@ class glance::config {
         notify => Service["openstack-glance-registry"],
     }
 	file { "/etc/glance/cirros.img":
-		source => "puppet:///modules/glance/cirros.img",
-		owner => "root",
-		group => "root",
-		mode => 0644,
-		require => File["/etc/glance/glance-registry-paste.ini"],
+        source => "puppet:///modules/glance/cirros.img",
+        owner => "root",
+        group => "root",
+        mode => 0644,
+        require => File["/etc/glance/glance-registry-paste.ini"],
         notify => Service["openstack-glance-registry"],
 	}
 }

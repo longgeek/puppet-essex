@@ -4,6 +4,6 @@ class keystone::service {
         hasstatus => true,
         enable => true,
         require => File["/etc/keystone/keystone.sh"],
-		notify => Exec["db_sync"],
+        notify => Exec["db_sync"],
     }
 }

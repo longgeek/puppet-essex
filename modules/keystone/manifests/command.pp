@@ -8,7 +8,7 @@ class keystone::command {
 	
 	exec { "keystone_iptables":
 		command => "mkdir -p /tmp/test/keystone;
-					iptables -I INPUT 1 -p tcp --dport 5000 -j ACCEPT;
+                    iptables -I INPUT 1 -p tcp --dport 5000 -j ACCEPT;
                     iptables -I INPUT 1 -p tcp --dport 35357 -j ACCEPT;
                     /etc/init.d/iptables save",
 		creates => "/tmp/test/keystone",

@@ -9,11 +9,11 @@ class dashboard::config {
     }
 
 	file { "/usr/lib/python2.6/site-packages/horizon/locale/zh_CN/LC_MESSAGES/django.mo":
-		source => "puppet:///modules/dashboard/django.mo",
-		owner => "root",
-		group => "root",
-		mode => "0644",
-		require => File["/etc/openstack-dashboard/local_settings"],
-		notify => Service["httpd"],
+        source => "puppet:///modules/dashboard/django.mo",
+        owner => "root",
+        group => "root",
+        mode => "0644",
+        require => File["/etc/openstack-dashboard/local_settings"],
+        notify => Service["httpd"],
 	}
 }

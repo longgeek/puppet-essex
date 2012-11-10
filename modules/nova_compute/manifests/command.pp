@@ -7,9 +7,9 @@ class nova_compute::command {
     }
 
     exec { "nova_db_sync":
-		command => "nova-manage db sync",
-		path => $command_path,
-		refreshonly => true,
+        command => "nova-manage db sync",
+        path => $command_path,
+        refreshonly => true,
     }
 
     exec { "nova_iptables":

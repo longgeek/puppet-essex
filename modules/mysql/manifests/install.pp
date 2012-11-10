@@ -3,6 +3,6 @@ class mysql::install {
         ensure => installed,
     }
     package { "mysql-devel":
-		ensure => installed,
+        ensure => installed,
     }
 }

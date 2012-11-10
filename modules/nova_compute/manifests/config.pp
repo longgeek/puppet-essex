@@ -4,8 +4,8 @@ class nova_compute::config {
         owner => "root",
         group => "nova",
         mode => 644,
-		require => Package["openstack-nova", "libvirt"],
-		notify => Exec["nova_conf"],
+        require => Package["openstack-nova", "libvirt"],
+        notify => Exec["nova_conf"],
     }
 
     file { "/etc/nova/api-paste.ini":

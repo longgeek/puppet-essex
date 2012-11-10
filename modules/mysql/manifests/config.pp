@@ -5,6 +5,6 @@ class mysql::config {
         group => "mysql",
         mode => 0600,
         require => Package["mysql", "mysql-server", "mysql-libs", "mysql-devel"],
-		notify => Service["mysqld"],
+        notify => Service["mysqld"],
     }
 }
