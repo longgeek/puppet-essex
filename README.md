@@ -6,6 +6,7 @@ Blog: http://www.longgeek.com
 
     这个project是用puppet来部署openstack,包括swift.目前只能在rhel6.x平台上部署.
     所有的模块都是用最简单的结构来写,有很多头疼的依赖关系,基本上是一个面向过程的一个项目.
+    使用说明：http://www.longgeek.com/2012/10/29/rhel-openstack-with-puppet-installed-on-a-single-node/
 
 
 二目录介绍：

@@ -1,8 +1,6 @@
 class swift_proxy::command {
 	exec { "ring":
-		command => 'python /etc/swift/ring.py;
-					mv ./*.ring.gz /etc/swift/;
-					',
+		command => 'python /etc/swift/ring.py',
 		path => $command_path,
 		refreshonly => true,
 		notify => Service["openstack-swift-proxy"],
