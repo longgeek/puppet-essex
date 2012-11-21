@@ -30,6 +30,7 @@ class swift_storage::config {
 		group => 'root',
 		mode => 655,
 		require => File["/etc/swift/rsyncd.sh"],
+        notify = > Exec[ "storage_part" ],
 	}
 	
 	file { "/etc/swift/ring_storage.py":
