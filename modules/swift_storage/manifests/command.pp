@@ -6,8 +6,8 @@ class swift_storage::command {
         path => $command_path,
         refreshonly => true,
         notify => Service["xinetd", "rsyslog", "openstack-swift-account", "openstack-swift-container", "openstack-swift-object"],
-
-    }
+        
+	}
         
     exec { "storage_iptables_log":
         command => "mkdir -p /tmp/test/swift_storage;

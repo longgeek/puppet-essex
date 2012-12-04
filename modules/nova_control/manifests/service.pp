@@ -1,5 +1,5 @@
 class nova_control::service {
-    service { ["openstack-nova-api", "openstack-nova-cert", "openstack-nova-network", "openstack-nova-scheduler", "openstack-nova-novncproxy", "openstack-nova-consoleauth", "tgtd", "rpcbind"]:
+    service { ["openstack-nova-api", "openstack-nova-cert", "openstack-nova-network", "openstack-nova-scheduler", "openstack-nova-novncproxy", "openstack-nova-consoleauth"]:
         ensure => running,
         hasstatus => true,
         enable => true,

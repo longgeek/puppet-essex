@@ -3,7 +3,8 @@
 import os
 
 disk_part = <%= storage_disk_part %>
-bind_ip = os.popen("ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}'").read().strip()
+#bind_ip = os.popen("ifconfig eth0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}'").read().strip()
+bind_ip = '0.0.0.0'
 
 for i in disk_part:
 	account_server = """

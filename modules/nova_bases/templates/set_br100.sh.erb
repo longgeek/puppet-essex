@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ifconfig -a | grep br100 > /dev/null
+if [ `echo $?` -eq 0 ];then
+    ifconfig br100 down
+    brctl delbr br100
+fi
+ip_address=`ip addr show <%= flat_interface %> | grep inet | head -n 1 | awk '{print $2}'`
+ip_start=`echo <%= fixed_range %> | awk -F. '{print $1"."$2"."$3"."}'`
+ip_end=`echo $ip_address | awk -F'/' '{print $1}' | awk -F. '{print $4}'`
+br100_ip=`echo $ip_start``echo $ip_end`
+ip_broadcast=`ip addr show <%= flat_interface %> | grep inet | head -n 1 | awk -F 'brd' '{print $2}' | awk '{print $1}'`
+mysql -unova -p<%= nova_db_password %> -h <%= mysql_host %> nova -e "update fixed_ips set host='$HOSTNAME' where address='$br100_ip';"
+brctl addbr br100
+ifconfig br100 $br100_ip
+ip addr add $ip_address broadcast $ip_broadcast dev br100
+ip addr del $ip_address broadcast $ip_broadcast dev <%= flat_interface %>
+brctl addif br100 <%= flat_interface %>
+

@@ -1,0 +1,16 @@
+<!--
+WARNING: THIS IS AN AUTO-GENERATED FILE. CHANGES TO IT ARE LIKELY TO BE 
+OVERWRITTEN AND LOST. Changes to this xml configuration should be made using:
+  virsh nwfilter-edit nova-allow-dhcp-server
+or other application using the libvirt API.
+-->
+
+<filter name='nova-allow-dhcp-server' chain='ipv4'>
+  <uuid>891e4787-e5c0-d59b-cbd6-41bc3c6b36fc</uuid>
+  <rule action='accept' direction='out' priority='100'>
+    <udp srcipaddr='0.0.0.0' dstipaddr='255.255.255.255' srcportstart='68' dstportstart='67'/>
+  </rule>
+  <rule action='accept' direction='in' priority='100'>
+    <udp srcipaddr='$DHCPSERVER' srcportstart='67' dstportstart='68'/>
+  </rule>
+</filter>
