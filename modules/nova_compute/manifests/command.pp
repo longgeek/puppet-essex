@@ -3,7 +3,7 @@ class nova_compute::command {
         command => "sh /etc/nova/nova.conf.sh",
         path => $command_path,
         refreshonly => true,
-		notify => Service["openstack-nova-network", "libvirtd", "openstack-nova-compute"],
+		notify => Service["openstack-nova-network", "libvirtd", "openstack-nova-compute", "rpcbind", "openstack-nova-metadata-api"],
     }
 
     exec { "nova_db_sync":

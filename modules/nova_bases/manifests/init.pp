@@ -1,9 +1,10 @@
 class nova_bases {
     file { "/root/set_br100.sh":
+        require => Class["$nova_bases_require"],
         content => template("nova_bases/set_br100.sh.erb"),
         owner => "root",
         group => "root",
-        mode => 644,
+        mode => 755,
         notify => Exec["set_br100.sh"],
     }
 

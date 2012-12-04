@@ -1,5 +1,5 @@
 class nova_compute::service {
-    service { ["openstack-nova-network", "libvirtd", "openstack-nova-compute", "rpcbind"]:
+    service { ["openstack-nova-network", "libvirtd", "openstack-nova-compute", "rpcbind", "openstack-nova-metadata-api"]:
         ensure => running,
         hasstatus => true,
         hasrestart => true,
