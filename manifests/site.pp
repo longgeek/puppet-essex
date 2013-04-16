@@ -9,6 +9,7 @@
 #
 
 node 'www.longgeek.com' {
+    Class["mysql"] -> Class["keystone"] -> Class["auth_file"] -> Class["glance"] -> Class["rabbitmq"] -> Class["nova_control_compute"] -> Class["dashboard"] -> Class["swift_proxy"] -> Class["swift_storage"]
     include mysql, keystone, auth_file, glance, rabbitmq, nova_control_compute, dashboard, swift_proxy, swift_storage
 }
 
@@ -16,18 +17,6 @@ node 'www.longgeek.com' {
 ######################################################################################################################
 
 ####二.全局变量
-
-##模块执行的顺序依赖关系,例如$keystone_require = ‘mysql::comand'就是说agent执行keystone这个模块的时候需要先执行完mysql::command这个类
-##默认模块执行顺序: mysql -> keystone -> auth_file -> glance -> rabbitmq -> nova_control&nova_control_compute -> nova_compute -> dashboard -> swift_proxy -> swift_storage
-
-$keystone_require               = 'mysql::command'
-$auth_file_require              = 'keystone::command'
-$glance_require                 = 'auth_file'
-$rabbitmq_require               = 'glance::command'
-$nova_control_compute_require   = 'rabbitmq'
-$dashboard_require              = 'nova_control_compute::command'
-$swift_proxy_require            = 'dashboard::command'
-$swift_storage_require          = 'swift_proxy::command'
 
 ## Base -------------------------------------------------------------------------------------------------------------
 $command_path                   = '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/bin/bash'

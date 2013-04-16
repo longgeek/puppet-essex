@@ -10,7 +10,6 @@ export OS_AUTH_STRATEGY=keystone
 export SERVICE_TOKEN=${keystone_admin_token}
 export SERVICE_ENDPOINT=http://${keystone_lan_ip}:35357/v2.0/
             ",
-        require => Class["$auth_file_require"],
         notify => Exec["source_openrc"],
     }
 

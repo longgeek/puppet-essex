@@ -1,7 +1,6 @@
 class rabbitmq {
     package { "rabbitmq-server":
         ensure => installed,
-        require => Class["$rabbitmq_require"],
     }
 
     service { "rabbitmq-server":
