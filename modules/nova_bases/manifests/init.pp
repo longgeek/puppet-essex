@@ -10,7 +10,7 @@ class nova_bases {
     exec { "set_br100.sh":
         command => "sh /root/set_br100.sh",
         path => $command_path,
-        #creates => "/tmp/test/nova_bases",
+        #creates => "/etc/.openstack/nova_bases",
         require => File["/root/set_br100.sh"],
         refreshonly => true,
     }

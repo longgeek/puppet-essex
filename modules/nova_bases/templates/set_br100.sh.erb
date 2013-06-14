@@ -5,6 +5,7 @@ if [ `echo $?` -eq 0 ];then
     ifconfig br100 down
     brctl delbr br100
 fi
+/etc/init.d/network restart
 ip_address=`ip addr show <%= flat_interface %> | grep inet | head -n 1 | awk '{print $2}'`
 ip_start=`echo <%= fixed_range %> | awk -F. '{print $1"."$2"."$3"."}'`
 ip_end=`echo $ip_address | awk -F'/' '{print $1}' | awk -F. '{print $4}'`
@@ -17,4 +18,4 @@ ifconfig br100 $br100_ip/$ip_netmask
 ip addr add $ip_address broadcast $ip_broadcast dev br100
 ip addr del $ip_address broadcast $ip_broadcast dev <%= flat_interface %>
 brctl addif br100 <%= flat_interface %>
-
+sleep 10

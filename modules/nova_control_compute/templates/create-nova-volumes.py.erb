@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+import os, re
+
+nova_volume_format = "disk"
+if nova_volume_format == "<%= nova_volume_format %>":
+    disk_part = <%= nova_volume_disk_part %>
+    for part in disk_part:
+        part_disk = (re.findall("[a-z]{3}",part))[0]
+        part_num = (re.findall("[1-9]{1}",part))[0]
+        if int(part_num) == int(1):
+            os.system("parted /dev/"+part_disk+" -s mklabel msdos")
+            os.system("parted /dev/"+part_disk+" -s mkpart primary 0 100%;  parted /dev/"+part_disk+" -s set 1 lvm on")
+        elif int(part_num) == int(5):
+            os.system("parted /dev/"+part_disk+" -s mklabel msdos")
+            part_start = os.popen("parted /dev/"+part_disk+" -s print | grep -v ^$ | tail -n 1 | awk '{print $3}'").read().strip()
+            os.system("parted /dev/"+part_disk+" -s mkpart extended "+part_start+" 100%")
+            os.system("parted /dev/"+part_disk+" -s mkpart logical "+part_start+" 100%; parted /dev/"+part_disk+" -s set "+part_num+" lvm on")
+        elif int(part_num) > int(5):
+            os.system("parted /dev/"+part_disk+" -s mklabel msdos")
+            part_start = os.popen("parted /dev/"+part_disk+" -s print | grep -v ^$ | tail -n 1 | awk '{print $3}'").read().strip()
+            os.system("parted /dev/"+part_disk+" -s mkpart logical "+part_start+" 100%; parted /dev/"+part_disk+" -s set "+part_num+" lvm on")
+    
+        else:
+            os.system("parted /dev/"+part_disk+" -s mklabel msdos")
+            part_start = os.popen("parted /dev/"+part_disk+" -s print | grep -v ^$ | tail -n 1 | awk '{print $3}'").read().strip()
+            os.system("parted /dev/"+part_disk+" -s mkpart primary "+part_start+" 100%; parted /dev/"+part_disk+" -s set "+part_num+" lvm on")
+
+        os.system("partx -a /dev/"+part_disk+" > /dev/null 2>&1")
+        os.system("partx -a /dev/"+part_disk+" > /dev/null 2>&1")
+        os.system("pvcreate /dev/"+part+"")
+        if part == disk_part[0]:
+            os.system("vgcreate nova-volumes /dev/"+part+"")
+        else:
+            os.system("vgextend nova-volumes /dev/"+part+"")
+    
+elif nova_volume_format == "file":
+    test = """ 
+    dd if=/dev/zero of=/opt/nova-volumes bs=1 count=0 seek=<%= nova_volume_size %>
+    losetup /dev/loop2 /opt/nova-volumes
+    parted /dev/loop2 -s mklabel msdos
+    parted /dev/loop2 -s mkpart primary 0 100%
+    parted /dev/loop2 -s set 1 lvm on
+    pvcreate /dev/loop2
+    vgcreate nova-volumes /dev/loop2
+    echo 'losetup /dev/loop2 /opt/nova-volumes' >> /etc/rc.local
+    """
+    os.system(test)
+
+else:
+    exit
+#os.system("sed -i 's/false/true/g' /etc/default/iscsitarget")

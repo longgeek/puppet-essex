@@ -1,0 +1,25 @@
+[server]
+# 日志级别: INFO|DEBUG|ERROR
+LOG_LEVEL = <%= pym_server_log_level %>
+
+# 日志文件
+LOG_FILE = /var/log/pymonitor/pym_server.log
+
+# Monitoring of the service listen port,the defalut value is 8123
+SERVER_PORT = <%= pym_server_port %>
+
+# the redis database services address,the defalut value is '127.0.0.1' 
+REDIS_HOST = 127.0.0.1
+
+# the link port to the redis database services,this part must be consistent with the redis database port.
+REDIS_PORT = 6379
+
+# 环数据集大小
+DATA_SIZE = <%= pym_server_data_size %>
+
+# 要监控的IP地址池, 多个地址已逗号区分, 必须类似于这样 ["127.0.0.1","127.0.0.2"], 请使用双引号
+CLIENT_IP = <%= pym_client_list %>
+
+# 求均值的时，向前延生计算的时间，单位是秒。 注意， 时间越小，精度越低
+AVERAGE_DELAY = <%= pym_server_average_delay %>
+

@@ -56,7 +56,7 @@ multi_host = <%= multi_host %>
 snapshot_image_format = qcow2
 use_cow_image = True
 novncproxy_base_url = http://<%= novnc_base_url_ip %>:6080/vnc_auto.html
-vncserver_proxyclient_address = <%= nova_compute_host %>
+vncserver_proxyclient_address = <%= novnc_base_url_ip %>
 vncserver_listen = 0.0.0.0
 
 iscsi_helper = tgtadm
